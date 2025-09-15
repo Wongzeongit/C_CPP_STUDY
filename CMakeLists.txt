@@ -24,6 +24,11 @@ add_executable(AllC_CPP
         DATASTRUCTURE/1-3.cpp
         DATASTRUCTURE/1-4.cpp
         HelloWorld.cpp
-        Cpractice/2-1.cpp
+        Cpractice/3-1(peach).cpp
         DATASTRUCTURE/1-4/List.h
+        Cpractice/3-2(carno).cpp
+        Cpractice/3-3(pp).cpp
+        "Cpractice/3-4(tranOcttoDec).cpp"
+        "Cpractice/3-5(nkcs).cpp"
+        "Cpractice/3-6(HIndex).cpp"
 )
