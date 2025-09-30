@@ -12,6 +12,13 @@
 
 
 void STARTGAME() {
+    img_head_up=newimage();getimage(img_head_up,"snakeHeadUp.png");
+    img_head_down=newimage();getimage(img_head_down,"snakeHeadDown.png");
+    img_head_left=newimage();getimage(img_head_left,"snakeHeadLeft.png");
+    img_head_right=newimage();getimage(img_head_right,"snakeHeadRight.png");
+    img_tail=newimage();getimage(img_tail,"snakeTail.png");
+    img_apple=newimage();getimage(img_apple,"china.png");
+    img_wall=newimage();getimage(img_wall,"wall.png");
     if (flag_diff==1) {
         SETWALL(wall);
     } else {
@@ -20,18 +27,16 @@ void STARTGAME() {
     }
     snake snk;
     snk.Printsnake();
-    PIMAGE apple=newimage();
-    getimage(apple,"china.png");
     for (;is_run();delay_fps(60)) {
         if (!Myapple.is_exist) {
             Myapple.position.first=rand()%19;
             Myapple.position.second=rand()%19;
             if (flag_diff==1) {
-                for (auto it:wall) {
-                    if (Myapple.position==it) {
+                for (int i=0;i<10;i++) {
+                    if (Myapple.position==wall.at(i)) {
                         Myapple.position.first=rand()%19;
                         Myapple.position.second=rand()%19;
-                        it=wall.at(0);
+                        i=0;
                     }
                 }
             } else {
@@ -46,9 +51,9 @@ void STARTGAME() {
                 Myapple.is_delicious=true;
                 break;
             }
-            putimage(Myapple.position.first*24+2,Myapple.position.second*24+2,apple);
             Myapple.is_exist=true;
         }
+        putimage(Myapple.position.first*24+2,Myapple.position.second*24+2,img_apple);
         int k=0;
         if (kbhit()) k=getch();
         switch (k) {
@@ -67,18 +72,27 @@ void STARTGAME() {
         }
         if (!snk.move(wall)) break;
         snk.Printsnake();
-        Sleep(300);
+        setfillcolor(BLACK);
+        bar(500,340,620,420);
+        setfont(18,0,"consolas");
+        setcolor(RED);
+        outtextxy(510,350,("最高分数："+std::to_string(Max_score)).c_str());
+        outtextxy(510,386,("当前分数："+std::to_string(score)).c_str());
+        int sleep_time=300-snk.length*8;
+        if (sleep_time<50) sleep_time=50;
+        Sleep(sleep_time);
     }
 }
 void GAMEOVER() {
-    MessageBox(NULL, "GAME OVER", "GAME OVER", MB_OK);
+    if (score>Max_score) Max_score=score;
+    std::string message="游戏结束！你的分数是："+std::to_string(score)+"\n最高分数是："+ std::to_string(Max_score);
+    score=0;
+    MessageBox(NULL, message.c_str(), "GAME OVER", MB_OK);
 }
 void SETWALL(std::pmr::vector<std::pair<int,int>> &wall) {
     cleardevice();
     SETBASE();
     wall.clear();
-    PIMAGE img_wall;
-    img_wall=newimage();
     getimage(img_wall,"wall.png");
     for (int n=0;n<10;n++) {
         int rdx=rand()%19;
@@ -159,8 +173,8 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
             cur=cur->next;
         }
         if (this->head->x-1==Myapple.position.first && this->head->y==Myapple.position.second) {
-            if (Myapple.is_delicious) {length++;tailtoremove=0;}
-            else if (length>2) {length--;tailtoremove=2;}
+            if (Myapple.is_delicious) {length++;tailtoremove=0;score+=20;}
+            else if (length>2) {length--;tailtoremove=2;score+=10;}
             Myapple.is_exist=false;
         }
         Node* newNode=new Node(this->head->x-1,this->head->y);
@@ -185,8 +199,8 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
             cur=cur->next;
         }
         if (this->head->x+1==Myapple.position.first && this->head->y==Myapple.position.second) {
-            if (Myapple.is_delicious) {length++;tailtoremove=0;}
-            else if (length>2) {length--;tailtoremove=2;}
+            if (Myapple.is_delicious) {length++;tailtoremove=0;score+=20;}
+            else if (length>2) {length--;tailtoremove=2;score+10;}
             Myapple.is_exist=false;
         }
         Node* newNode=new Node(this->head->x+1,this->head->y);
@@ -211,8 +225,8 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
             cur=cur->next;
         }
         if (this->head->x==Myapple.position.first && this->head->y-1==Myapple.position.second) {
-            if (Myapple.is_delicious) {length++;tailtoremove=0;}
-            else if (length>2) {length--;tailtoremove=2;}
+            if (Myapple.is_delicious) {length++;tailtoremove=0;score+=20;}
+            else if (length>2) {length--;tailtoremove=2;score+=10;}
             Myapple.is_exist=false;
         }
         Node* newNode=new Node(this->head->x,this->head->y-1);
@@ -237,8 +251,8 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
             cur=cur->next;
         }
         if (this->head->x==Myapple.position.first && this->head->y+1==Myapple.position.second) {
-            if (Myapple.is_delicious) {length++;tailtoremove=0;}
-            else if (length>2) {length--;tailtoremove=2;}
+            if (Myapple.is_delicious) {length++;tailtoremove=0;score+=20;}
+            else if (length>2) {length--;tailtoremove=2;score+=10;}
             Myapple.is_exist=false;
         }
         Node* newNode=new Node(this->head->x,this->head->y+1);
@@ -255,7 +269,7 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
         }
         Node* tail = cur->next;
         setfillcolor(BLACK);
-        floodfill(tail->x*24+1,tail->y*24+1,BLUE);
+        bar(tail->x*24+1,tail->y*24+1,tail->x*24+23,tail->y*24+23);
         delete tail;
         cur->next=nullptr;
     }
@@ -263,21 +277,15 @@ bool snake::move(const std::pmr::vector<std::pair<int,int>> wall) {
 }
 void snake::Printsnake() const {
     Node* cur=head;
-    PIMAGE img_head;
-    img_head=newimage();
-    if (direction=="left") {getimage(img_head,"snakeHeadLeft.png");}
-    else if (direction=="right") {getimage(img_head,"snakeHeadRight.png");}
-    else if (direction=="up") {getimage(img_head,"snakeHeadUp.png");}
-    else {getimage(img_head,"snakeHeadDown.png");}
+    PIMAGE img_head=nullptr;
+    if (direction=="left") {img_head=img_head_left;}
+    else if (direction=="right") {img_head=img_head_right;}
+    else if (direction=="up") {img_head=img_head_up;}
+    else {img_head=img_head_down;}
     putimage(cur->x*24+2,cur->y*24+2,img_head);
-    delimage(img_head);
     cur=cur->next;
-    PIMAGE img_tail;
-    img_tail=newimage();
-    getimage(img_tail,"snakeTail.png");
     while (cur) {
         putimage(cur->x*24+2,cur->y*24+2,img_tail);
         cur=cur->next;
         }
-    delimage(img_tail);
 }
